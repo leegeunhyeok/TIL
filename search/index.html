@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>TIL Search</title>
+    <style>
+    
+    html, body, #wrap {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #wrap {
+      position: relative;
+      background-color: #1e1e1e;
+      color: #eee;
+    }
+
+    #center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -70%);
+      text-align: center;
+    }
+
+    #center input, button  {
+      outline: none;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    #center button {
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    #center button:hover {
+      background-color: #aaa;
+    }
+
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    #loading-icon {
+      position: fixed;
+      display: inline-block;
+      background-color: rgba(0, 0, 0, 0.5);
+      top: 50%;
+      left: calc(50% - 25px);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      animation: loading 1s alternate infinite;
+    }
+
+    @keyframes loading {
+      0% {
+        transform: scale(0.0);
+      }
+
+      100% {
+        transform: scale(1.0)
+      }
+    }
+
+    @-o-keyframes loading {
+      0% {
+        transform: scale(0.0);
+      }
+
+      100% {
+        transform: scale(1.0)
+      }
+    }
+
+    @-ms-keyframes loading {
+      0% {
+        transform: scale(0.0);
+      }
+
+      100% {
+        transform: scale(1.0)
+      }
+    }
+
+    @-moz-keyframes loading {
+      0% {
+        transform: scale(0.0);
+      }
+
+      100% {
+        transform: scale(1.0)
+      }
+    }
+
+    @-webkit-keyframes loading {
+      0% {
+        transform: scale(0.0);
+      }
+
+      100% {
+        transform: scale(1.0)
+      }
+    }
+    
+    </style>
+    <script>
+
+    var searching = false
+
+    function showLoadingView (show) {
+      document.getElementById('loading').style.display = show ? 'inline-block' : 'none'
+    }
+
+    function search (keyword) {
+      showLoadingView(true)
+      var req = new XMLHttpRequest()
+      req.open('GET', '/search?keyword=' + keyword, true)
+      req.onreadystatechange = function (event) {
+        if (req.readyState === 4) {
+          if (req.status === 200) {
+            console.log(req.response)
+          } else {
+            console.log(event)
+          }
+          showLoadingView(false)
+        }
+      }
+      req.send(null)
+    }
+    
+    window.onload = function () {
+      showLoadingView(false)
+      document.getElementById('search').onclick = function () {
+        var value = document.getElementById('keyword').value
+        if (value.length <= 2) {
+          alert('키워드는 2자리 이상 입력해주세요!')
+        } else {
+          if (!searching) {
+            search(value)
+          } else {
+            alert('검색 중 입니다.. 잠시만 기다려 주세요!')
+          }
+        }
+      }
+    }
+    
+    </script>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="center">
+         <h1>Search</h1>
+         <input id="keyword" placeholder="Keyword">
+         <button id="search">Go!</button>
+      </div>
+    </div>
+    <div id="loading">
+      <span id="loading-icon"></span>
+    </div>
+  </body>
+</html>
