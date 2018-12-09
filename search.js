@@ -26,13 +26,15 @@ app.get('/search', (req, res) => {
   const dir = path.join(__dirname, 'TIL')
   const searchFiles = []
 
+  console.log('Search:', keyword)
+
   // 키워드가 없는 경우
   if (!keyword) {
     res.json({ code: 1, data: [] })
     return
   }
 
-  if (keyword.length <= 2) {
+  if (keyword.length < 2) {
     res.json({ code: 2, data: [] })
     return
   }
