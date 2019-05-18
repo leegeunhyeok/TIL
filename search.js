@@ -4,7 +4,9 @@ const path = require('path')
 const express = require('express')
 const app = express()
 
-app.get('/', (req, res) => {
+const PORT = 8080
+
+app.get('/', (_req, res) => {
   fs.readFile(path.join(__dirname, 'search', 'index.html'), (err, data) => {
     if (err) {
       res.send('Error! : ' + err)
@@ -20,8 +22,10 @@ app.get('/', (req, res) => {
  * 0: 정상
  * 1: 키워드가 없음
  * 2: 키워드가 2자리 이하
+ * 3: 검색 결과 없음
+ * -1: 오류
  */
-app.get('/search', (req, res) => {
+app.get('/search', async (req, res) => {
   const keyword = req.query.keyword.toLowerCase()
   const dir = path.join(__dirname, 'TIL')
   const searchFiles = []
@@ -39,28 +43,35 @@ app.get('/search', (req, res) => {
     return
   }
 
-  // TIL 디렉토리 내의 모든 파일에서 keyword 조회
-  (function search (keyword, next) {
-    const years = fs.readdirSync(dir, 'utf-8')
-    years.forEach(year => {
-      const files = fs.readdirSync(path.join(dir, year), 'utf-8')
-      files.forEach(file => {
-        const data = fs.readFileSync(path.join(dir, year, file), 'utf-8').toString().toLowerCase()
-        if (data.indexOf(keyword) !== -1) {
+  try {
+    const yearDirectory = await fs.readdir(dir, 'utf-8')
+    for (let year of yearDirectory) {
+      const files = await fs.readdir(path.join(dir, year), 'utf-8')
+
+      for (let file of files) {
+        const find = fs.readFile(path.join(dir, year, file), 'utf-8')
+            .toString()
+            .toLowerCase()
+            .includes(keyword) 
+            
+        if (find) {
           searchFiles.push(`${year}_${file}`)
         }
-      })
-    })
-    next(searchFiles)
-  })(keyword, result => {
-    res.json({ code: 0, data: result })
-  })
+      }
+    }
+
+    const code = searchFiles.length ? 0 : 3
+
+    res.json({ code, data: searchFiles })
+  } catch (err) {
+    res.json({ code: -1, err })
+  }
 })
 
 process.on('uncaughtException', err => {
-  console.log(err)
+  console.log('uncaughtException >', err)
 })
 
-app.listen(8080, () => {
-  console.log('Search server started.')
+app.listen(PORT, () => {
+  console.log('Search server started.', PORT)
 })
