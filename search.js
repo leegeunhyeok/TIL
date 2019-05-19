@@ -27,7 +27,7 @@ app.get('/', (_req, res) => {
  * 3: 검색 결과 없음
  * -1: 오류
  */
-app.get('/search', async (req, res) => {
+app.get('/search', (req, res) => {
   const keyword = req.query.keyword.toLowerCase()
   const dir = path.join(__dirname, 'TIL')
   const searchFiles = []
