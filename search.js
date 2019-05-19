@@ -6,6 +6,8 @@ const app = express()
 
 const PORT = 8080
 
+const asyncWrap = 
+
 app.get('/', (_req, res) => {
   fs.readFile(path.join(__dirname, 'search', 'index.html'), (err, data) => {
     if (err) {
@@ -44,12 +46,12 @@ app.get('/search', async (req, res) => {
   }
 
   try {
-    const yearDirectory = await fs.readdir(dir, 'utf-8')
+    const yearDirectory = fs.readdirSync(dir, 'utf-8')
     for (let year of yearDirectory) {
-      const files = await fs.readdir(path.join(dir, year), 'utf-8')
+      const files = fs.readdirSync(path.join(dir, year), 'utf-8')
 
       for (let file of files) {
-        const find = fs.readFile(path.join(dir, year, file), 'utf-8')
+        const find = fs.readFileSync(path.join(dir, year, file), 'utf-8')
             .toString()
             .toLowerCase()
             .includes(keyword) 
